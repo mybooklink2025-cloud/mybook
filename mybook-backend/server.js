@@ -11,31 +11,28 @@ const app = express();
 // Middlewares
 app.use(express.json());
 
-// Configurar CORS para permitir tu frontend de Vercel
-app.use(
-  cors({
-    origin: [
-      "http://localhost:3000", // para pruebas locales
-      "https://mybook-6oemkhl89-mybooks-projects-bd842ad5.vercel.app", // tu frontend en vercel
-    ],
-    methods: ["GET", "POST", "PUT", "DELETE"],
-    credentials: true,
-  })
-);
+// CORS
+app.use(cors({
+  origin: [
+    "http://localhost:3000",
+    "https://mybook-6oemkhl89-mybooks-projects-bd842ad5.vercel.app",
+  ],
+  methods: ["GET","POST","PUT","DELETE"],
+  credentials: true
+}));
 
-// 🔹 Ruta de prueba (mover antes de authRoutes)
+// Ruta de prueba
 app.get("/auth/test", (req, res) => {
   res.json({ message: "✅ Backend conectado correctamente" });
 });
 
-// Rutas principales
+// Rutas auth
 app.use("/auth", authRoutes);
 
 // Conexión a MongoDB
-mongoose
-  .connect(process.env.MONGO_URI, { useNewUrlParser: true, useUnifiedTopology: true })
+mongoose.connect(process.env.MONGO_URI)
   .then(() => console.log("✅ Conectado a MongoDB"))
-  .catch((err) => console.error("❌ Error conectando a MongoDB:", err));
+  .catch(err => console.error("❌ Error MongoDB:", err));
 
 // Puerto
 const PORT = process.env.PORT || 5000;
