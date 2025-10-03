@@ -7,7 +7,7 @@ const app = express();
 // Middleware
 app.use(express.json());
 
-// CORS: permite frontend local y Vercel
+// CORS
 app.use(
   cors({
     origin: [
