@@ -1,24 +1,21 @@
 import express from "express";
 import cors from "cors";
-import dotenv from "dotenv";
 import authRoutes from "./routes/auth.js";
-
-dotenv.config();
 
 const app = express();
 
-// Middlewares
+// Middleware
 app.use(express.json());
 
-// Configurar CORS
+// CORS: permite frontend local y Vercel
 app.use(
   cors({
     origin: [
       "http://localhost:3000",
-      "https://https://mybook2.vercel.app"
-      "https://https://mybook3.vercel.app"
-      "https://https://mybook4.vercel.app"
-      "https://https://mybook5.vercel.app"
+      "https://mybook2.vercel.app",
+      "https://mybook3.vercel.app",
+      "https://mybook4.vercel.app",
+      "https://mybook5.vercel.app"
     ],
     methods: ["GET", "POST"],
     credentials: true,
@@ -27,7 +24,7 @@ app.use(
 
 // Ruta de prueba
 app.get("/auth/test", (req, res) => {
-  res.json({ message: "✅ Backend conectado correctamente" });
+  res.json({ message: "✅ Backend mock conectado correctamente" });
 });
 
 // Rutas
