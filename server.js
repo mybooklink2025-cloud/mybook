@@ -7,12 +7,15 @@ const app = express();
 // Middleware
 app.use(express.json());
 
-// CORS: permite frontend local y tu URL real de Vercel
+// CORS: permite frontend local y frontends en Vercel
 app.use(
   cors({
     origin: [
       "http://localhost:3000",
-      "https://mybook-7a9s.vercel.app"
+      "https://mybook2.vercel.app",
+      "https://mybook3.vercel.app",
+      "https://mybook4.vercel.app",
+      "https://mybook5.vercel.app"
     ],
     methods: ["GET", "POST"],
     credentials: true,

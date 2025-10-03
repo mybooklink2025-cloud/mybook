@@ -1,24 +1,29 @@
 import express from "express";
+
 const router = express.Router();
 
-let usuarios = []; // usuarios guardados temporalmente
+// Usuarios en memoria
+const usuarios = [];
 
 // Registro
 router.post("/register", (req, res) => {
   const { email, password } = req.body;
-  if (usuarios.find(u => u.email === email)) {
+  const existe = usuarios.find(u => u.email === email);
+  if (existe) {
     return res.status(400).json({ message: "El correo ya está registrado" });
   }
-  usuarios.push({ email, password });
-  res.status(201).json({ message: "Usuario registrado correctamente ✅" });
+  const nuevoUsuario = { email, password, id: Date.now().toString() };
+  usuarios.push(nuevoUsuario);
+  res.status(201).json({ message: "Usuario registrado correctamente ✅", _id: nuevoUsuario.id });
 });
 
 // Login
 router.post("/login", (req, res) => {
   const { email, password } = req.body;
-  const user = usuarios.find(u => u.email === email && u.password === password);
-  if (!user) return res.status(400).json({ message: "Usuario o contraseña incorrecta" });
-
+  const usuario = usuarios.find(u => u.email === email && u.password === password);
+  if (!usuario) {
+    return res.status(400).json({ message: "Usuario o contraseña incorrectos" });
+  }
   res.json({ message: "Inicio de sesión exitoso ✅", token: "MOCK_TOKEN" });
 });
 
