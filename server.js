@@ -1,7 +1,8 @@
 import express from "express";
 import cors from "cors";
 import authRoutes from "./routes/auth.js";
-import multer from "multer";
+import path from "path";
+import { fileURLToPath } from "url";
 
 const app = express();
 
@@ -23,8 +24,10 @@ app.use(
   })
 );
 
-// Configuración de multer
-export const upload = multer({ dest: "uploads/" });
+// Para servir carpeta uploads
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 
 // Ruta de prueba
 app.get("/auth/test", (req, res) => {
