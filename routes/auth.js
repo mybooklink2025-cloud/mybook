@@ -69,4 +69,25 @@ router.post("/login", async (req, res) => {
 });
 
 // Subir foto de perfil
-router.post("/upload-profile-picture", upload.single("file"), (re
+router.post("/upload-profile-picture", upload.single("profilePicture"), (req, res) => {
+  try {
+    const authHeader = req.headers.authorization;
+    if (!authHeader) return res.status(401).json({ message: "No autorizado" });
+
+    const token = authHeader.split(" ")[1];
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+
+    const usuario = usuarios.find(u => u.email === decoded.email);
+    if (!usuario) return res.status(404).json({ message: "Usuario no encontrado" });
+
+    if (!req.file) return res.status(400).json({ message: "No se subió ningún archivo" });
+
+    usuario.profilePicture = req.file.filename;
+
+    res.json({ message: "Foto subida correctamente", filename: req.file.filename });
+  } catch (error) {
+    res.status(500).json({ message: "Error al subir la foto", error: error.message });
+  }
+});
+
+export default router;
