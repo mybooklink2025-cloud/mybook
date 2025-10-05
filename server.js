@@ -1,15 +1,18 @@
 import express from "express";
 import cors from "cors";
+import dotenv from "dotenv";
 import authRoutes from "./routes/auth.js";
+import contactRoutes from "./routes/contact.js";
 import path from "path";
 import { fileURLToPath } from "url";
 
+dotenv.config();
 const app = express();
 
 // Middleware
 app.use(express.json());
 
-// CORS
+// CORS flexible para cualquier frontend
 app.use(
   cors({
     origin: [
@@ -19,24 +22,25 @@ app.use(
       "https://mybook4.vercel.app",
       "https://mybook5.vercel.app"
     ],
+
     methods: ["GET", "POST"],
     credentials: true,
   })
 );
 
-// Para servir carpeta uploads
+// Configuración para servir imágenes
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 
 // Ruta de prueba
 app.get("/auth/test", (req, res) => {
-  res.json({ message: "✅ Backend mock conectado correctamente" });
+  res.json({ message: "✅ Backend conectado correctamente" });
 });
 
-// Rutas
+// Rutas principales
 app.use("/auth", authRoutes);
+app.use("/contact", contactRoutes);
 
-// Puerto
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => console.log(`🚀 Servidor corriendo en puerto ${PORT}`));
