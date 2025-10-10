@@ -12,23 +12,26 @@ const app = express();
 // Middleware
 app.use(express.json());
 
-app.use(cors({
-  origin: [
-    "http://localhost:3000",
-    "https://mybook2.vercel.app",
-    "https://mybook3.vercel.app",
-    "https://mybook4.vercel.app",
-  ],
-  methods: ["GET", "POST"],
-  credentials: true
-}));
+// CORS flexible para cualquier frontend
+app.use(
+  cors({
+    origin: [
+      "http://localhost:3000",
+      "https://mybook3.vercel.app",
+      "https://mybook4.vercel.app",
+      "https://mybook5.vercel.app"
+    ],
+    methods: ["GET", "POST"],
+    credentials: true,
+  })
+);
 
-// Servir imágenes si hay
+// Configuración para servir imágenes
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 
-// Rutas
+// Rutas principales
 app.use("/auth", authRoutes);
 app.use("/contact", contactRoutes);
 

@@ -1,12 +1,16 @@
 import express from "express";
+import path from "path";
+import { fileURLToPath } from "url";
 
 const router = express.Router();
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 // Función para enviar correo con SendGrid
 const sendWithSendGrid = async ({ from, to, subject, text, html }) => {
   const sgMail = await import("@sendgrid/mail");
   const SENDGRID_API_KEY = process.env.SENDGRID_API_KEY;
-  if (!SENDGRID_API_KEY) throw new Error("SENDGRID_API_KEY no configurada");
+  if (!SENDGRID_API_KEY) throw new Error("SENDGRID_API_KEY not configured");
   sgMail.default.setApiKey(SENDGRID_API_KEY);
 
   const msg = { to, from, subject, text, html };
@@ -42,7 +46,7 @@ router.post("/", async (req, res) => {
     return res.status(200).json({ message: "✅ Mensaje enviado correctamente (SendGrid)" });
 
   } catch (error) {
-    console.error("Error contact route:", error.message || error);
+    console.error("Contact route error:", error);
     res.status(500).json({ message: "❌ Error al enviar el mensaje", error: error.message });
   }
 });
