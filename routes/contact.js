@@ -25,7 +25,7 @@ router.post("/", async (req, res) => {
       return res.status(400).json({ message: "Todos los campos son requeridos" });
     }
 
-    const remitente = process.env.EMAIL_FROM || "no-reply@mybook.app";
+    const remitente = process.env.EMAIL_FROM;
     const destinatariosEnv = process.env.EMAIL_TO || "";
     const destinatarios = destinatariosEnv.split(",").map(s => s.trim()).filter(Boolean);
 
@@ -43,8 +43,8 @@ router.post("/", async (req, res) => {
     `;
 
     await sendWithSendGrid({ from: remitente, to: destinatarios, subject, text, html });
-    return res.status(200).json({ message: "✅ Mensaje enviado correctamente (SendGrid)" });
 
+    return res.status(200).json({ message: "✅ Mensaje enviado correctamente (SendGrid)" });
   } catch (error) {
     console.error("Contact route error:", error);
     res.status(500).json({ message: "❌ Error al enviar el mensaje", error: error.message });
