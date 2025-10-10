@@ -15,9 +15,9 @@ app.use(express.json());
 app.use(cors({
   origin: [
     "http://localhost:3000",
-    "https://mybook2.vercel.app"
-    "https://mybook3.vercel.app"
-    "https://mybook4.vercel.app"
+    "https://mybook2.vercel.app",
+    "https://mybook3.vercel.app",
+    "https://mybook4.vercel.app",
   ],
   methods: ["GET", "POST"],
   credentials: true
