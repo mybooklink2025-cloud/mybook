@@ -6,7 +6,6 @@ const router = express.Router();
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-// Función para enviar correo con SendGrid
 const sendWithSendGrid = async ({ from, to, subject, text, html }) => {
   const sgMail = await import("@sendgrid/mail");
   const SENDGRID_API_KEY = process.env.SENDGRID_API_KEY;
@@ -17,7 +16,6 @@ const sendWithSendGrid = async ({ from, to, subject, text, html }) => {
   return sgMail.default.send(msg);
 };
 
-// Ruta POST /contact
 router.post("/", async (req, res) => {
   try {
     const { nombre, email, mensaje } = req.body;
@@ -26,8 +24,7 @@ router.post("/", async (req, res) => {
     }
 
     const remitente = process.env.EMAIL_FROM;
-    const destinatariosEnv = process.env.EMAIL_TO || "";
-    const destinatarios = destinatariosEnv.split(",").map(s => s.trim()).filter(Boolean);
+    const destinatarios = process.env.EMAIL_TO.split(",").map(s => s.trim()).filter(Boolean);
 
     if (!destinatarios.length) {
       return res.status(500).json({ message: "No hay destinatarios configurados en EMAIL_TO" });
@@ -35,16 +32,14 @@ router.post("/", async (req, res) => {
 
     const subject = `Nuevo mensaje de contacto desde MyBook: ${nombre}`;
     const text = `Nombre: ${nombre}\nEmail: ${email}\n\nMensaje:\n${mensaje}`;
-    const html = `
-      <p><strong>Nombre:</strong> ${nombre}</p>
-      <p><strong>Email:</strong> ${email}</p>
-      <p><strong>Mensaje:</strong></p>
-      <p>${mensaje}</p>
-    `;
+    const html = `<p><strong>Nombre:</strong> ${nombre}</p>
+                  <p><strong>Email:</strong> ${email}</p>
+                  <p><strong>Mensaje:</strong></p>
+                  <p>${mensaje}</p>`;
 
     await sendWithSendGrid({ from: remitente, to: destinatarios, subject, text, html });
+    res.status(200).json({ message: "✅ Mensaje enviado correctamente (SendGrid)" });
 
-    return res.status(200).json({ message: "✅ Mensaje enviado correctamente (SendGrid)" });
   } catch (error) {
     console.error("Contact route error:", error);
     res.status(500).json({ message: "❌ Error al enviar el mensaje", error: error.message });
