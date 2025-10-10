@@ -1,31 +1,16 @@
 import express from "express";
-import path from "path";
-import { fileURLToPath } from "url";
 
 const router = express.Router();
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
 
 // Función para enviar correo con SendGrid
 const sendWithSendGrid = async ({ from, to, subject, text, html }) => {
   const sgMail = await import("@sendgrid/mail");
   const SENDGRID_API_KEY = process.env.SENDGRID_API_KEY;
-  if (!SENDGRID_API_KEY) throw new Error("SENDGRID_API_KEY not configured");
+  if (!SENDGRID_API_KEY) throw new Error("SENDGRID_API_KEY no configurada");
   sgMail.default.setApiKey(SENDGRID_API_KEY);
 
   const msg = { to, from, subject, text, html };
   return sgMail.default.send(msg);
-};
-
-// Función para enviar correo con Nodemailer/Gmail
-const sendWithNodemailer = async ({ from, to, subject, text, html }) => {
-  const nodemailer = await import("nodemailer");
-  const transporter = nodemailer.createTransport({
-    service: "gmail",
-    auth: { user: process.env.GMAIL_USER, pass: process.env.GMAIL_PASS },
-  });
-
-  return transporter.sendMail({ from, to, subject, text, html });
 };
 
 // Ruta POST /contact
@@ -36,7 +21,7 @@ router.post("/", async (req, res) => {
       return res.status(400).json({ message: "Todos los campos son requeridos" });
     }
 
-    const remitente = process.env.EMAIL_FROM || process.env.GMAIL_USER || "no-reply@mybook.app";
+    const remitente = process.env.EMAIL_FROM || "no-reply@mybook.app";
     const destinatariosEnv = process.env.EMAIL_TO || "";
     const destinatarios = destinatariosEnv.split(",").map(s => s.trim()).filter(Boolean);
 
@@ -53,26 +38,11 @@ router.post("/", async (req, res) => {
       <p>${mensaje}</p>
     `;
 
-    // Intentar enviar con SendGrid si está configurado
-    try {
-      if (process.env.SENDGRID_API_KEY) {
-        await sendWithSendGrid({ from: remitente, to: destinatarios, subject, text, html });
-        return res.status(200).json({ message: "✅ Mensaje enviado correctamente (SendGrid)" });
-      }
-    } catch (sgError) {
-      console.error("SendGrid error:", sgError.message || sgError);
-    }
+    await sendWithSendGrid({ from: remitente, to: destinatarios, subject, text, html });
+    return res.status(200).json({ message: "✅ Mensaje enviado correctamente (SendGrid)" });
 
-    // Fallback a Nodemailer/Gmail
-    try {
-      await sendWithNodemailer({ from: remitente, to: destinatarios, subject, text, html });
-      return res.status(200).json({ message: "✅ Mensaje enviado correctamente (Gmail fallback)" });
-    } catch (nmError) {
-      console.error("Nodemailer error:", nmError.message || nmError);
-      return res.status(500).json({ message: "❌ Error al enviar el mensaje", error: nmError.message || nmError });
-    }
   } catch (error) {
-    console.error("Contact route error:", error);
+    console.error("Error contact route:", error.message || error);
     res.status(500).json({ message: "❌ Error al enviar el mensaje", error: error.message });
   }
 });
