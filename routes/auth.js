@@ -62,11 +62,31 @@ router.post("/login", async (req, res) => {
 // Subir foto de perfil
 router.post("/upload-profile-picture", upload.single("profilePicture"), (req, res) => {
   const { email } = req.body;
-  const usuario = usuarios.find(u => u.email === email);
+
+  let usuario = usuarios.find(u => u.email === email);
+
+  // Crear automáticamente el usuario de Google si todavía no existe
+  if (!usuario && email) {
+    usuario = {
+      email,
+      password: "",
+      profilePicture: "",
+    };
+    usuarios.push(usuario);
+  }
+
   if (!usuario) return res.status(404).json({ message: "Usuario no encontrado" });
 
+  if (!req.file) {
+    return res.status(400).json({ message: "No se recibió ninguna foto" });
+  }
+
   usuario.profilePicture = req.file.filename;
-  res.json({ message: "Foto subida correctamente ✅", filename: req.file.filename });
+
+  res.json({
+    message: "Foto subida correctamente ✅",
+    filename: req.file.filename,
+  });
 });
 
 export default router;
