@@ -1,6 +1,7 @@
 import express from "express";
 import cors from "cors";
 import dotenv from "dotenv";
+import mongoose from "mongoose";
 import authRoutes from "./routes/auth.js";
 import contactRoutes from "./routes/contact.js";
 import postsRoutes from "./routes/posts.js";
@@ -12,6 +13,12 @@ import { Server } from "socket.io";
 dotenv.config();
 const app = express();
 const server = http.createServer(app); // 🔹 Reemplaza app.listen() al final
+
+// Conexión con MongoDB
+mongoose
+  .connect(process.env.MONGODB_URI)
+  .then(() => console.log("🍃 MongoDB conectado correctamente"))
+  .catch((error) => console.error("❌ Error conectando a MongoDB:", error));
 
 // Middleware para parsear JSON
 app.use(express.json());
